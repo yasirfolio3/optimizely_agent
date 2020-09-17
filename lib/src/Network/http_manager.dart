@@ -18,8 +18,9 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 
 class HttpManager {
-  final String _sdkKey;
-  final String _url;
+  String _sdkKey;
+  String _url;
+  String _token = "";
   final _client = Dio();
 
   HttpManager(this._sdkKey, this._url) {
@@ -30,11 +31,20 @@ class HttpManager {
     };
   }
 
-  Future<Response> getRequest(String endpoint) {
-    return _client.get('$_url$endpoint');
+  HttpManager.fromToken(this._token, this._url) {
+    _client.options.baseUrl = _url;
+    _client.options.headers = {
+      "Authorization": 'Bearer $_token',
+      HttpHeaders.contentTypeHeader: "application/json"
+    };
   }
 
-  Future<Response> postRequest(String endpoint, Object body, [Map<String, String> queryParams]) {
+  Future<Response> getRequest(String endpoint) {
+    return _client.get(endpoint);
+  }
+
+  Future<Response> postRequest(String endpoint, Object body,
+      [Map<String, String> queryParams]) {
     return _client.post(endpoint, data: body, queryParameters: queryParams);
   }
 }

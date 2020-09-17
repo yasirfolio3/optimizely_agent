@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and      *
  * limitations under the License.                                           *
  ***************************************************************************/
- 
+
 import 'package:meta/meta.dart';
 import 'package:dio/dio.dart';
 
@@ -27,22 +27,49 @@ class RequestManager {
     _manager = HttpManager(sdkKey, url);
   }
 
-  Future<Response> getOptimizelyConfig() async {
+  RequestManager.fromToken(String token, url) {
+    _manager = HttpManager.fromToken(token, url);
+  }
+
+  Future<Response> getJWTToken(
+      {@required String grantType,
+      @required String clientId,
+      @required String clientSecret}) async {
+    Map<String, dynamic> body = {
+      "grant_type": grantType,
+      "client_id": clientId,
+      "client_secret": clientSecret
+    };
+
     Response resp;
     try {
-      resp = await _manager.getRequest("/v1/config");
-    } on DioError catch(err) {
-      resp = err.response != null ? err.response : new Response(statusCode: 0, statusMessage: err.message);      
+      resp = await _manager.postRequest("/oauth/token", body);
+    } on DioError catch (err) {
+      print(err.message);
+      resp = err.response != null
+          ? err.response
+          : new Response(statusCode: 0, statusMessage: err.message);
     }
     return resp;
   }
 
-  Future<Response> track({
-    @required String eventKey,
-    String userId,
-    Map<String, dynamic> eventTags,
-    Map<String, dynamic> userAttributes
-  }) async {
+  Future<Response> getOptimizelyConfig() async {
+    Response resp;
+    try {
+      resp = await _manager.getRequest("/v1/config");
+    } on DioError catch (err) {
+      resp = err.response != null
+          ? err.response
+          : new Response(statusCode: 0, statusMessage: err.message);
+    }
+    return resp;
+  }
+
+  Future<Response> track(
+      {@required String eventKey,
+      String userId,
+      Map<String, dynamic> eventTags,
+      Map<String, dynamic> userAttributes}) async {
     Map<String, dynamic> body = {};
 
     if (userId != null) {
@@ -59,30 +86,34 @@ class RequestManager {
 
     Response resp;
     try {
-      resp = await _manager.postRequest("/v1/track", body, {"eventKey": eventKey});
-    } on DioError catch(err) {
-      resp = err.response != null ? err.response : new Response(statusCode: 0, statusMessage: err.message);
+      resp =
+          await _manager.postRequest("/v1/track", body, {"eventKey": eventKey});
+    } on DioError catch (err) {
+      resp = err.response != null
+          ? err.response
+          : new Response(statusCode: 0, statusMessage: err.message);
     }
     return resp;
   }
 
-  Future<Response> overrideDecision({
-    @required String userId,
-    @required String experimentKey,
-    @required String variationKey
-  }) async {    
+  Future<Response> overrideDecision(
+      {@required String userId,
+      @required String experimentKey,
+      @required String variationKey}) async {
     Map<String, dynamic> body = {
       "userId": userId,
       "experimentKey": experimentKey,
       "variationKey": variationKey
     };
-    
+
     Response resp;
     try {
       resp = await _manager.postRequest("/v1/override", body);
-    } on DioError catch(err) {
+    } on DioError catch (err) {
       print(err.message);
-      resp = err.response != null ? err.response : new Response(statusCode: 0, statusMessage: err.message);
+      resp = err.response != null
+          ? err.response
+          : new Response(statusCode: 0, statusMessage: err.message);
     }
     return resp;
   }
@@ -96,39 +127,41 @@ class RequestManager {
     DecisionType type,
     bool enabled,
   }) async {
-    Map<String, dynamic> body = { "userId": userId };
-    
+    Map<String, dynamic> body = {"userId": userId};
+
     if (userAttributes != null) {
       body["userAttributes"] = userAttributes;
     }
 
     Map<String, String> queryParams = {};
-    
+
     if (featureKey != null) {
       queryParams["featureKey"] = featureKey.join(',');
     }
-    
+
     if (experimentKey != null) {
       queryParams["experimentKey"] = experimentKey.join(',');
     }
-    
+
     if (disableTracking != null) {
       queryParams["disableTracking"] = disableTracking.toString();
     }
-    
+
     if (type != null) {
       queryParams["type"] = type.toString().split('.').last;
     }
-    
+
     if (enabled != null) {
       queryParams["enabled"] = enabled.toString();
     }
-    
+
     Response resp;
     try {
       resp = await _manager.postRequest("/v1/activate", body, queryParams);
-    } on DioError catch(err) {
-      resp = err.response != null ? err.response : new Response(statusCode: 0, statusMessage: err.message);
+    } on DioError catch (err) {
+      resp = err.response != null
+          ? err.response
+          : new Response(statusCode: 0, statusMessage: err.message);
     }
     return resp;
   }

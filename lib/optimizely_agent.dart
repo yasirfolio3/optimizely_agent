@@ -14,6 +14,7 @@
  * limitations under the License.                                           *
  ***************************************************************************/
 
+import 'dart:convert';
 import 'package:meta/meta.dart';
 import 'package:dio/dio.dart';
 
@@ -42,6 +43,20 @@ class OptimizelyAgent {
     _requestmanager = RequestManager(sdkKey, url);
   }
 
+  OptimizelyAgent.fromToken(String token, String url) {
+    _requestmanager = RequestManager.fromToken(token, url);
+  }
+
+  /// Returns valid JWT token
+  Future<Map<String, dynamic>> getJWTToken(
+      {@required String grantType,
+      @required String clientId,
+      @required String clientSecret}) async {
+    Response resp = await _requestmanager.getJWTToken(
+        grantType: grantType, clientId: clientId, clientSecret: clientSecret);
+    return resp.statusCode == 200 ? json.decode(resp.data) : null;
+  }
+
   /// Returns status code and OptimizelyConfig object
   Future<OptimizelyConfig> getOptimizelyConfig() async {
     Response resp = await _requestmanager.getOptimizelyConfig();
@@ -49,54 +64,48 @@ class OptimizelyAgent {
   }
 
   /// Tracks an event and returns nothing.
-  Future<void> track({
-    @required String eventKey,
-    String userId,
-    Map<String, dynamic> eventTags,
-    Map<String, dynamic> userAttributes
-  }) {
+  Future<void> track(
+      {@required String eventKey,
+      String userId,
+      Map<String, dynamic> eventTags,
+      Map<String, dynamic> userAttributes}) {
     return _requestmanager.track(
-      eventKey: eventKey,
-      userId: userId,
-      eventTags: eventTags,
-      userAttributes: userAttributes
-    );    
+        eventKey: eventKey,
+        userId: userId,
+        eventTags: eventTags,
+        userAttributes: userAttributes);
   }
 
   /// Overrides a decision for the user and returns OverrideResponse object.
-  Future<OverrideResponse> overrideDecision({
-    @required String userId,
-    @required String experimentKey,
-    @required String variationKey
-  }) async {
+  Future<OverrideResponse> overrideDecision(
+      {@required String userId,
+      @required String experimentKey,
+      @required String variationKey}) async {
     Response resp = await _requestmanager.overrideDecision(
-      userId: userId,
-      experimentKey: experimentKey,
-      variationKey: variationKey
-    );
+        userId: userId,
+        experimentKey: experimentKey,
+        variationKey: variationKey);
     return resp.statusCode == 200 ? OverrideResponse.fromJson(resp.data) : null;
   }
 
   /// Activate makes feature and experiment decisions for the selected query parameters
   /// and returns list of OptimizelyDecision
-  Future<List<OptimizelyDecision>> activate({
-    @required String userId,
-    Map<String, dynamic> userAttributes,
-    List<String> featureKey,
-    List<String> experimentKey,
-    bool disableTracking,
-    DecisionType type,
-    bool enabled
-  }) async {
+  Future<List<OptimizelyDecision>> activate(
+      {@required String userId,
+      Map<String, dynamic> userAttributes,
+      List<String> featureKey,
+      List<String> experimentKey,
+      bool disableTracking,
+      DecisionType type,
+      bool enabled}) async {
     Response resp = await _requestmanager.activate(
-      userId: userId,
-      userAttributes: userAttributes,
-      featureKey: featureKey,
-      experimentKey: experimentKey,
-      disableTracking: disableTracking,
-      type: type,
-      enabled: enabled
-    );
+        userId: userId,
+        userAttributes: userAttributes,
+        featureKey: featureKey,
+        experimentKey: experimentKey,
+        disableTracking: disableTracking,
+        type: type,
+        enabled: enabled);
     if (resp.statusCode == 200) {
       List<OptimizelyDecision> optimizelyDecisions = [];
       resp.data.forEach((element) {
