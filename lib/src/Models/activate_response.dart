@@ -14,8 +14,8 @@
  * limitations under the License.                                           *
  ***************************************************************************/
 
-class ActivateResponse {
-  ActivateResponse(this.userId, this.experimentKey, this.error);
+class OptimizelyDecision {
+  OptimizelyDecision(this.userId, this.experimentKey, this.error);
 
   String userId;
   String experimentKey;
@@ -26,33 +26,29 @@ class ActivateResponse {
   bool enabled;
   String error;
 
-  factory ActivateResponse.fromJson(Map<String, dynamic> json) =>
-      _$ActivateResponseFromJson(json);
-
-  Map<String, dynamic> toJson() => _$ActivateResponseToJson(this);
-}
-
-ActivateResponse _$ActivateResponseFromJson(Map<String, dynamic> json) {
-  return ActivateResponse(
-    json['userId'] as String,
-    json['experimentKey'] as String,
-    json['error'] as String ?? '',
-  )
+  factory OptimizelyDecision.fromJson(Map<String, dynamic> json) {
+    return OptimizelyDecision(
+      json['userId'] as String,
+      json['experimentKey'] as String,
+      json['error'] as String ?? '',
+    )
     ..featureKey = json['featureKey'] as String
     ..variationKey = json['variationKey'] as String
     ..type = json['type'] as String
     ..variables = json['variables'] as Map<String, dynamic> ?? {}
     ..enabled = json['enabled'] as bool;
-}
+  }
 
-Map<String, dynamic> _$ActivateResponseToJson(ActivateResponse instance) =>
-    <String, dynamic>{
-      'userId': instance.userId,
-      'experimentKey': instance.experimentKey,
-      'featureKey': instance.featureKey,
-      'variationKey': instance.variationKey,
-      'type': instance.type,
-      'variables': instance.variables,
-      'enabled': instance.enabled,
-      'error': instance.error,
+  Map<String, dynamic> toJson() {
+    return <String, dynamic> {
+      'userId': this.userId,
+      'experimentKey': this.experimentKey,
+      'featureKey': this.featureKey,
+      'variationKey': this.variationKey,
+      'type': this.type,
+      'variables': this.variables,
+      'enabled': this.enabled,
+      'error': this.error,
     };
+  }
+}

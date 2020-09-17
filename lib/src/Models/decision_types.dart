@@ -14,4 +14,4 @@
  * limitations under the License.                                           *
  ***************************************************************************/
 
-enum decisionType { feature, experiment }
+enum DecisionType { feature, experiment }

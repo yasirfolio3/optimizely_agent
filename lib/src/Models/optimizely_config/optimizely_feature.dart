@@ -14,10 +14,8 @@
  * limitations under the License.                                           *
  ***************************************************************************/
 
-import 'package:optimizely_agent_client/src/Models/optimizely_config/optimizely_experiment.dart';
-import 'package:optimizely_agent_client/src/Models/optimizely_config/optimizely_variable.dart';
-
-export 'package:optimizely_agent_client/src/Models/optimizely_config/optimizely_variable.dart';
+import './optimizely_experiment.dart';
+import './optimizely_variable.dart';
 
 class OptimizelyFeature {
   String id;

@@ -15,7 +15,6 @@
  ***************************************************************************/
 
 import 'dart:io';
-
 import 'package:dio/dio.dart';
 
 class HttpManager {
@@ -31,13 +30,11 @@ class HttpManager {
     };
   }
 
-  Future<Response> getRequest(String endpoint) async {
-    return await _client.get('$_url$endpoint');
+  Future<Response> getRequest(String endpoint) {
+    return _client.get('$_url$endpoint');
   }
 
-  Future<Response> postRequest(String endpoint, Object body,
-      [Map<String, String> queryParams]) async {
-    return await _client.post(endpoint,
-        data: body, queryParameters: queryParams);
+  Future<Response> postRequest(String endpoint, Object body, [Map<String, String> queryParams]) {
+    return _client.post(endpoint, data: body, queryParameters: queryParams);
   }
 }
